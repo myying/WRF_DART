@@ -55,16 +55,21 @@ $SCRIPT_DIR/namelist_dart.sh > input.nml
 #     endif  number of domains check
 #  endif    ADAPTIVE_INFLATION file check
 
-$SCRIPT_DIR/job_submit.sh $dart_ntasks 0 $dart_ppn ./filter
+echo "    filter started"
+if [ ! -f obs_seq.final ]; then
+  $SCRIPT_DIR/job_submit.sh $dart_ntasks 0 $dart_ppn ./filter
+fi
 
 ###Check if finished successfully
 watch_log dart_log.out Finished 5 $rundir
 
 ###diagnose and move output files
+echo "    adding analysis increment to members"
 for n in `seq 1 $MAX_DOM`; do
   dm=d`expr $n + 100 |cut -c2-`
   for NE in `seq 1 $NUM_ENS`; do
     id=`expr $NE + 1000 |cut -c2-`
+    cp -f $WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $DATE`_${id} $WORK_DIR/fc/$DATE/wrfinput_${dm}_${id}
     ncks -A -v `echo ${UPDATE_VAR[*]} |tr ' ' ','` filter_restart_${dm}_${id} $WORK_DIR/fc/$DATE/wrfinput_${dm}_${id}
   done
 done
