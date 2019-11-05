@@ -22,7 +22,7 @@ if $FOLLOW_STORM; then
     watch_file $WORK_DIR/rc/$DATE/ij_parent_start 1 $rundir
     cp $WORK_DIR/rc/$DATE/ij_parent_start $WORK_DIR/rc/$DATE/ij_parent_start_4dvar
   else
-    if $RUN_ENKF; then
+    if $RUN_DART; then
       i_parent_start="1 "
       j_parent_start="1 "
       for n in `seq 2 $MAX_DOM`; do
@@ -40,7 +40,7 @@ if $FOLLOW_STORM; then
       j_parent_start="1 "
       for n in `seq 2 $MAX_DOM`; do
         dm=d`expr $n + 100 |cut -c2-`
-        if $RUN_ENKF; then
+        if $RUN_DART; then
           outfile=$WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_$(wrf_time_string `advance_time $DATE $OBS_WIN_MIN`)_mean
         else
           outfile=$WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_$(wrf_time_string `advance_time $DATE $OBS_WIN_MIN`)

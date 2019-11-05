@@ -76,19 +76,19 @@ while [[ $NEXTDATE -le $DATE_CYCLE_END ]]; do  #CYCLE LOOP
     $SCRIPT_DIR/module_wrf_ens.sh &
   fi
   # First deterministic run for 4DVar
-  if $RUN_4DVAR && ! $RUN_ENKF && [ $DATE == $DATE_START ]; then
+  if $RUN_4DVAR && ! $RUN_DART && [ $DATE == $DATE_START ]; then
     $SCRIPT_DIR/module_wrf_window.sh &
   fi
 
   # Data assimilation for each cycle
   if [ $DATE -ge $DATE_CYCLE_START ] && [ $DATE -le $DATE_CYCLE_END ]; then
-#    # Processing observations
-#    if $RUN_ENKF || $RUN_4DVAR; then
-#      $SCRIPT_DIR/module_obsproc.sh &
-#    fi
+    # Processing observations
+    if $RUN_DART || $RUN_4DVAR; then
+      $SCRIPT_DIR/module_obsproc.sh &
+    fi
 
     # EnKF
-    if $RUN_ENKF; then
+    if $RUN_DART; then
       $SCRIPT_DIR/module_enkf.sh &
     fi
     # 4DVar

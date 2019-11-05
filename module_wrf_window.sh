@@ -18,7 +18,7 @@ if [ $DATE == $DATE_START ]; then
   export start_date=$DATE
   export run_minutes=$(echo "$run_minutes_cycle+$OBS_WIN_MIN" |bc)
 else
-  if $RUN_ENKF; then
+  if $RUN_DART; then
     echo "  Running WRF deterministic forecast (4DVar analysis -> correct analysis time)..."
     export start_date=`advance_time $DATE $OBS_WIN_MIN`
     export run_minutes=`abs $OBS_WIN_MIN`
@@ -114,7 +114,7 @@ done
 #Check output
 watch_log rsl.error.0000 SUCCESS 1 $rundir
 
-if $RUN_ENKF; then
+if $RUN_DART; then
 ##wrfinput at $DATE for enkf replace mean (hybrid)
   outfile=wrfinput_d01_`wrf_time_string $DATE`
   watch_file $outfile 1 $rundir

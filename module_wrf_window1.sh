@@ -10,7 +10,7 @@ if [[ `cat stat` == "complete" ]]; then exit; fi
 
 #Check dependency
 wait_for_module ../icbc 
-if $RUN_ENKF; then wait_for_module ../../$PREVDATE/wrf_ens; fi
+if $RUN_DART; then wait_for_module ../../$PREVDATE/wrf_ens; fi
 
 echo "  Running WRF through obs window (fg -> fg02)..."
 echo running > stat
@@ -47,7 +47,7 @@ EOF
   ln -fs ../../../rc/$DATE/wrfinput_d01 wrfinput_d01_real
   rm -f wrfinput_d01_update
 
-  if $RUN_ENKF; then
+  if $RUN_DART; then
     ln -fs ../../../fc/$PREVDATE/wrfinput_d01_`wrf_time_string $indate`_mean wrfinput_d01_update
   else
     ln -fs ../../../fc/$PREVDATE/wrfinput_d01_`wrf_time_string $indate` wrfinput_d01_update
@@ -68,7 +68,7 @@ for i in 1; do
 
   for n in `seq 1 $MAX_DOM`; do
     dm=d`expr $n + 100 |cut -c2-`
-    if $RUN_ENKF; then
+    if $RUN_DART; then
       ln -fs ../../../fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $indate`_mean wrfinput_${dm}
     else
       ln -fs ../../../fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $indate` wrfinput_${dm}
@@ -102,7 +102,7 @@ watch_log rsl.error.0000 SUCCESS 1 $rundir
 ##wrfinput for next cycle
 outfile=wrfinput_d01_`wrf_time_string $outdate`
 watch_file $outfile 1 $rundir
-if $RUN_ENKF; then
+if $RUN_DART; then
   mv $outfile $WORK_DIR/fc/$PREVDATE/wrfinput_d01_`wrf_time_string $outdate`_mean
 else
   mv $outfile $WORK_DIR/fc/$PREVDATE/wrfinput_d01_`wrf_time_string $outdate`
@@ -112,7 +112,7 @@ if [ $MAX_DOM -gt 1 ]; then
     dm=d`expr $n + 100 |cut -c2-`
     outfile=wrfout_${dm}_`wrf_time_string $outdate`
     watch_file $outfile 1 $rundir
-    if $RUN_ENKF; then
+    if $RUN_DART; then
       mv $outfile $WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $outdate`_mean
     else
       mv $outfile $WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $outdate`

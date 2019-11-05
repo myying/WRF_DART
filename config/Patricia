@@ -1,8 +1,8 @@
 ##The following is a detailed description of each configuration file entry
 #work flow control
- RUN_ENKF=true               #if true, run EnKF component
+ RUN_DART=true               #if true, run EnKF component
  RUN_4DVAR=false	             #if true, run 4DVar component
-                             #if both RUN_ENKF and RUN_4DVAR are true, run a hybrid E4DVar
+                             #if both RUN_DART and RUN_4DVAR are true, run a hybrid E4DVar
  RUN_ENVAR=false             #if true, run 4DEnVar instead of E4DVar
 
  FOLLOW_STORM=true           #if true, nested domain will be preset to move following the path of 
@@ -18,7 +18,7 @@
  EXP_NAME=Patricia              #name of experiment
  DATE_START=201510211200        #initial date, need to have available first guess (0 6 12 18 h)
  DATE_END=201510231200          #end date
- DATE_CYCLE_START=201510211800  #date of first assimilation cycle, also need first guess available
+ DATE_CYCLE_START=201510211500  #date of first assimilation cycle, also need first guess available
  DATE_CYCLE_END=201510231100    #date of final assimilation cycle
 
 #time control: unit=minutes
@@ -45,11 +45,12 @@
  WRF_BC_DIR=$CODE_DIR/WRF_BC_v2.1_alltime  #path to update_wrf_bc.exe
  WRFDA_DIR=$CODE_DIR/WRFDAV3.9.1           #WRFDA package (contains da_wrfvar.exe and runtime files)
  MULTI_INC_DIR=$CODE_DIR/MULTI_INC         #path to da_decimation.exe, da_bdy.exe
- ENKF_DIR=$CODE_DIR/DART                   #path to enkf.mpi
+ DART_DIR=$CODE_DIR/DART                   #path to enkf.mpi
  FG_DIR=$DATA_DIR/fnl                      #path to first guess files
  GEOG_DIR=$WORK/data/geog                  #path to geog, needed by WPS
  BE_DIR=$DATA_DIR                          #path to be.dat
  TCVITALS_DIR=$WORK/data/tcvitals          #tcvitals data files
+ TCV_INTERVAL=360
 
 #domain setup
  TWO_WAY_NESTING=true         #if true, set feedback=1 in namelist.input for WRF
@@ -87,15 +88,13 @@
  CUDT=(5 5 5)
  SST_UPDATE=1
 
-#ENKF options
+#DART options
  NUM_ENS=20                      #ensemble size
  REPLACE_MEAN=false              #if true, replace ensemble mean with $REPLACE_MEAN_WITH after analysis
  REPLACE_MEAN_WITH=forecast
 
 #data sources
  INCLUDE_LITTLE_R=true           #include LITTLE_R formatted data as input to obsproc.exe
- INCLUDE_BUFR=false              #   ..   BUFR   ..
- INCLUDE_MADIS=false             #   ..   MADIS  ..
 
 #Some of the following switches are shared in namelist_enkf and namelist_wrfvar to select certain observation types
 #                              in  namelist.enkf      in wrfvar namelist.input

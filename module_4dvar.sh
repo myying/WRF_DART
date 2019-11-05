@@ -7,11 +7,11 @@ cd $rundir
 if [[ `cat stat` == "complete" ]]; then exit; fi
 
 #Check dependency
-wait_for_module ../icbc ../wrf_window1
+wait_for_module ../icbc ../wrf_window1 ../obsproc
 if $RUN_ENVAR; then
   wait_for_module ../wrf_ens_window1
 fi
-if $RUN_ENKF; then
+if $RUN_DART; then
   wait_for_module ../../$PREVDATE/wrf_ens
 fi
 
@@ -35,7 +35,7 @@ for n in $domlist; do
   cd $dm
 
   #Calculate ensemble perturbation (ep)
-  if $RUN_ENKF; then
+  if $RUN_DART; then
     echo "    calculating ep for domain $dm"
     if $RUN_ENVAR; then
       ep_offset=`seq $OBS_WIN_MIN $MINUTES_PER_SLOT $OBS_WIN_MAX`
@@ -102,7 +102,7 @@ for n in $domlist; do
   done
 
   #Prepare first guess and BC
-  if $RUN_ENKF; then
+  if $RUN_DART; then
     fg_file=$WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $time_window_min`_mean
     fg02_file=$WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $time_window_max`_mean
   else
@@ -213,7 +213,7 @@ if $MULTI_INC; then
         else
           export var4d=true
         fi
-        if $RUN_ENKF; then
+        if $RUN_DART; then
           export ensdim_alpha=$NUM_ENS
         else
           export ensdim_alpha=0
@@ -329,7 +329,7 @@ else  #full resolution 4DVar
     cd $dm
    
     export num_fgat_time=$fgat_num
-    if $RUN_ENKF; then
+    if $RUN_DART; then
       export ensdim_alpha=$NUM_ENS
     else
       export ensdim_alpha=0
