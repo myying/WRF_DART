@@ -5,25 +5,21 @@
                              #if both RUN_ENKF and RUN_4DVAR are true, run a hybrid E4DVar
  RUN_ENVAR=false             #if true, run 4DEnVar instead of E4DVar
 
- FORECAST_TO_END=false       #if true, run_forecast.sh will run from analysis time to DATE_END
-
  FOLLOW_STORM=true           #if true, nested domain will be preset to move following the path of 
-                             #  storm location from tcvitals data
- #STORM_ID=al132010           #storm id, format: basin (al) num (13) year (2010)
-
- CLEAN=true                  #if true, delete unwanted wrfout files in rundir
+ STORM_ID=ep202015           #storm id, format: basin (al) num (13) year (2010)
 
  MULTI_PHYS_ENS=false         #if true, use a multi-physics ensemble
-
  MULTI_INC=true              #if true, run a multi-incremental version of 4DVar
  DECIMATION_FACTOR=3         #ratio of high/low resolution in multi-incremental 4DVar
+
+ CLEAN=true                  #if true, delete unwanted wrfout files in rundir
 
 #experiment design
  EXP_NAME=Patricia              #name of experiment
  DATE_START=201510211200        #initial date, need to have available first guess (0 6 12 18 h)
- DATE_END=201510211800          #end date
- DATE_CYCLE_START=201510211500  #date of first assimilation cycle, also need first guess available
- DATE_CYCLE_END=201510211800    #date of final assimilation cycle
+ DATE_END=201510231200          #end date
+ DATE_CYCLE_START=201510211800  #date of first assimilation cycle, also need first guess available
+ DATE_CYCLE_END=201510231100    #date of final assimilation cycle
 
 #time control: unit=minutes
  CYCLE_PERIOD=60                #interval among cycles
@@ -36,6 +32,7 @@
                                 #Observation window is usually set to +-1/2 CYCLE_PERIOD, so that
                                 #EnKF analysis date locates in the center of the window.
 
+ FORECAST_TO_END=false          #if true, determ forecast will run from analysis time to DATE_END
  FORECAST_MINUTES=360           #default length of forecast from analysis
 
 #directories
@@ -177,7 +174,7 @@
                        # 2 - execute run_cycle.sh as a bash script, each component is submitted
                        #     as a separate job in the queue, scheduling is done by the queue.
 
- real_ntasks=32                 # number of processes for wps, real programs
+ wps_ntasks=32                  # number of processes for WPS programs and real.exe
  wrf_ntasks=128                 # ..    ..  ..  ..  WRF run       (wrf.exe)
  var3d_ntasks=128               # ..    ..  ..  ..  3DVar component (perturb_ic da_wrfvar.exe)
  var4d_ntasks=(128 128 128)     # ..    ..  ..  ..  4DVar component (da_wrfvar.exe) (for each domain)

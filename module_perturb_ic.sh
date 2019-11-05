@@ -117,7 +117,7 @@ if [ $DATE == $DATE_START ]; then
         tid=$((tid+1))
         if [[ $tid == $nt ]]; then
           tid=0
-           wait
+          wait
         fi
         cd ../..
       done

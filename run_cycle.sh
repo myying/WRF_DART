@@ -101,7 +101,6 @@ while [[ $NEXTDATE -le $DATE_CYCLE_END ]]; do  #CYCLE LOOP
     if $RUN_ENVAR; then
       $SCRIPT_DIR/module_wrf_ens_window1.sh &
     fi
-#    $SCRIPT_DIR/module_wrf.sh &
   fi
   wait
 

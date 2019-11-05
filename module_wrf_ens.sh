@@ -1,5 +1,6 @@
 #!/bin/bash
 . $CONFIG_FILE
+
 rundir=$WORK_DIR/run/$DATE/wrf_ens
 if [[ ! -d $rundir ]]; then mkdir -p $rundir; echo waiting > $rundir/stat; fi
 
@@ -7,7 +8,7 @@ cd $rundir
 if [[ `cat stat` == "complete" ]]; then exit; fi
 
 #Check dependency
-wait_for_module ../icbc 
+wait_for_module ../icbc
 if [ $DATE == $DATE_START ]; then wait_for_module ../perturb_ic; fi
 if [ $DATE -gt $DATE_START ]; then
   if $RUN_ENKF; then wait_for_module ../enkf; fi
@@ -16,7 +17,7 @@ fi
 echo running > stat
 
 export start_date=$DATE
-export run_minutes=$run_minutes_cycle 
+export run_minutes=$run_minutes_cycle
 if $RUN_4DVAR; then
   export inputout_interval=`abs $OBS_WIN_MIN`
   export inputout_begin=`echo "$run_minutes + $OBS_WIN_MIN" |bc`
@@ -39,7 +40,7 @@ for r in 1 1.5; do
     if [[ ! -d $id ]]; then mkdir $id; fi
     touch $id/rsl.error.0000
     if [[ `tail -n5 $id/rsl.error.0000 |grep SUCCESS` ]]; then continue; fi
-  
+
     cd $id
 
     ####Update and perturb BC
@@ -55,7 +56,7 @@ for r in 1 1.5; do
  #wrf_input_from_si_randmean = 'random_mean'
  #wrf_3dvar_random_draw = 'random_draw'
  #cycling = .true.
- #low_bdy_only = .false. 
+ #low_bdy_only = .false.
  #perturb_bdy = .true.
  #n_1 = $n_1
 #/
@@ -72,20 +73,22 @@ for r in 1 1.5; do
       #ln -fs ../../../../fc/$DATE_START/wrfinput_d01 random_mean
       #echo $n_1 $randnum >> ../../../../fc/rand_$id
 
-      #./update_wrf_bc.exe >& update_wrf_bc.log 
+      #./update_wrf_bc.exe >& update_wrf_bc.log
       #watch_log update_wrf_bc.log successfully 1 $rundir
       #mv wrfbdy_d01_update $WORK_DIR/fc/wrfbdy_d01_$id
     #fi
-    if [ $DATE == $LBDATE ]; then
-      export sst_update=1
-    else
-      export sst_update=0
-    fi
+
+    ##????
+    #if [ $DATE == $LBDATE ]; then
+      #export sst_update=1
+    #else
+      #export sst_update=0
+    #fi
 
     ####Running model
     ln -fs $WRF_DIR/run/* .
     rm -f namelist.*
-  
+
     for n in `seq 1 $MAX_DOM`; do
       dm=d`expr $n + 100 |cut -c2-`
       if $RUN_ENKF; then
@@ -94,7 +97,6 @@ for r in 1 1.5; do
         ln -fs ../../../../fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $DATE`_$id wrfinput_$dm
       fi
     done
-    #ln -fs ../../../../fc/wrfbdy_d01_$id wrfbdy_d01
 		ln -fs ../../../../fc/wrfbdy_d01 wrfbdy_d01
 
     if $MULTI_PHYS_ENS; then
@@ -104,7 +106,10 @@ for r in 1 1.5; do
     fi
 
     if [[ $SST_UPDATE == 1 ]]; then
-      ln -fs ../../../../fc/wrflowinp_d?? .
+      for n in `seq 1 $MAX_DOM`; do
+        dm=d`expr $n + 100 |cut -c2-`
+        ln -fs ../../../../rc/$DATE_START/wrflowinp_$dm .
+      done
     fi
 
     if $FOLLOW_STORM; then
@@ -113,7 +118,6 @@ for r in 1 1.5; do
     fi
     $SCRIPT_DIR/namelist_wrf.sh wrf > namelist.input
     $SCRIPT_DIR/job_submit.sh $wrf_ntasks $((tid*$wrf_ntasks)) $HOSTPPN ./wrf.exe >& wrf.log &
-#    mpirun.lsf ./wrf.exe
 
     tid=$((tid+1))
     if [[ $tid == $nt ]]; then
@@ -165,21 +169,7 @@ if $RUN_4DVAR; then
     if [[ $outdate -ne $DATE ]]; then
       for n in `seq 1 $MAX_DOM`; do
         dm=d`expr $n + 100 |cut -c2-`
-        if [[ ! -d mean_${dm}_$outdate ]]; then mkdir -p mean_${dm}_$outdate; fi
-        cd mean_${dm}_$outdate
-        for NE in `seq 1 $NUM_ENS`; do
-          id=`expr $NE + 1000 |cut -c2-`
-          ln -fs ../../../../fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_$id fort.`expr 80010 + $NE`
-        done
-        cp -L fort.80011 fort.`expr 80011 + $NUM_ENS`
-        $SCRIPT_DIR/namelist_enkf.sh $n > namelist.enkf
-        ln -fs $ENKF_DIR/ensemble_mean.exe .
-        $SCRIPT_DIR/job_submit.sh $enkf_ntasks 0 $enkf_ppn ./ensemble_mean.exe >& ensemble_mean.log 
-#        mpirun.lsf ./ensemble_mean.exe >& ensemble_mean.log
-
-        watch_log ensemble_mean.log Successful 1 $rundir
-        mv fort.`expr 80011 + $NUM_ENS` $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_mean
-        cd ..
+        ncea $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_??? $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_mean
       done
     else
       ln -sf $WORK_DIR/fc/$DATE/wrfinput_d01_mean $WORK_DIR/fc/$DATE/wrfinput_d01_`wrf_time_string $outdate`_mean
@@ -187,13 +177,13 @@ if $RUN_4DVAR; then
   done
 fi
 
-if $CLEAN; then 
+if $CLEAN; then
   for NE in `seq 1 $NUM_ENS`; do
     id=`expr $NE + 1000 |cut -c2-`
-    rm -f $rundir/$id/wrfout*
+    #rm -f $rundir/$id/wrfout* &
+    rm ???/rsl.* &
   done
 fi
 
 echo complete > stat
-rm ???/rsl.* &
 

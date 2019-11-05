@@ -3,8 +3,13 @@
 #  storm center (from tcvitals data). Storm center lat/lon are calculated at each time (including
 #  start/end time for wrf and any lbc (0 6 12 18Z) time in between. The storm is assumed to move
 #  linearly between any two given location points.
-#      
+#
 #  Only move the smallest domain, and use corral_dist to force move its parent domains
+#
+##required tcvitals data file:
+#$TCVITALS_DIR/ccyy/storm_id/ccyymmddhhii.dat containing the line valid at ccyymmdd hhii00
+#example: Patricia 2015: storm_id=ep202015
+#ftp://ftp.nhc.noaa.gov/atcf/archive/2015/tcvitals/ep202015-tcvitals-arch.dat
 #
 #Input: date1 = wrf run start date
 #       date2 = wrf run end date
@@ -26,7 +31,7 @@ n=$(echo "`diff_time $fgdate1 $fgdate2`/$LBC_INTERVAL" |bc)
 # Get storm lat lon at each time node
 for i in `seq 0 $n`; do
   tcdate=`advance_time $fgdate1 $((i*$LBC_INTERVAL))`
-  tcvitals_data=$TCVITALS_DIR/${tcdate:0:4}/${tcdate}.${STORM_ID}-tcvitals.dat
+  tcvitals_data=$TCVITALS_DIR/${tcdate:0:4}/${STORM_ID}/${tcdate}.dat
   if [ ! -f $tcvitals_data ]; then echo "$tcvitals_data not found!"; exit; fi
   latstr=`head -n1 $tcvitals_data |awk '{print $6}'`
   lonstr=`head -n1 $tcvitals_data |awk '{print $7}'`
