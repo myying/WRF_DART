@@ -90,8 +90,8 @@
 
 #DART options
  NUM_ENS=20                      #ensemble size
- REPLACE_MEAN=false              #if true, replace ensemble mean with $REPLACE_MEAN_WITH after analysis
- REPLACE_MEAN_WITH=forecast
+ ADAPTIVE_INFLATION=true
+ UPDATE_VAR=(U V W PH T MU QVAPOR QCLOUD QRAIN QICE QSNOW QGRAUP U10 V10 T2 Q2 PSFC)
 
 #data sources
  INCLUDE_LITTLE_R=true           #include LITTLE_R formatted data as input to obsproc.exe
@@ -177,5 +177,6 @@
  wrf_ntasks=128                 # ..    ..  ..  ..  WRF run       (wrf.exe)
  var3d_ntasks=128               # ..    ..  ..  ..  3DVar component (perturb_ic da_wrfvar.exe)
  var4d_ntasks=(128 128 128)     # ..    ..  ..  ..  4DVar component (da_wrfvar.exe) (for each domain)
- enkf_ntasks=128                # ..    ..  ..  ..  EnKF component (enkf.mpi)
+ dart_ntasks=256                # ..    ..  ..  ..  EnKF component (enkf.mpi)
+ dart_ppn=16
 

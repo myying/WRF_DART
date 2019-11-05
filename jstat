@@ -7,7 +7,7 @@ if [ ! -d $rundir ]; then echo "$rundir doesn't exist"; exit; fi
 for t in `ls $rundir |grep 20 |tail -n5`; do
   echo "==== `wrf_time_string $t` ===="
 
-for c in obsproc icbc enkf 4dvar perturb_ic wrf_ens wrf_ens_window1 wrf_window wrf_window1 wrf; do
+for c in obsproc icbc dart 4dvar perturb_ic wrf_ens wrf_ens_window1 wrf_window wrf_window1 wrf; do
   if [ -d $rundir/$t/$c ]; then
      stat=`cat $rundir/$t/$c/stat`
      printf "%12s" "$c"
@@ -54,26 +54,8 @@ for c in obsproc icbc enkf 4dvar perturb_ic wrf_ens wrf_ens_window1 wrf_window w
              echo "$m (`tail -n1 $rundir/$t/$c/$n/$m/rsl.error.0000`)"
            done
            ;;
-         enkf)
-           for dm in `/bin/ls $rundir/$t/$c |grep 'd[0-9][0-9]'`; do
-             echo -e "\e[7m$dm\e[0m"
-             if [ ! -f $rundir/$t/$c/$dm/enkf.log ]; then
-               echo "preparing... "
-               ls -l $rundir/$t/$c/$dm/fort.9*
-             else
-               if [ ! -z "`tail -n5 $rundir/$t/$c/$dm/enkf.log |grep Successful`" ]; then
-                 echo -e "\e[7menkf.mpi done\e[0m"
-                 if [ -d $rundir/$t/$c/$dm/replace_mean ]; then
-                   echo -e "\e[7mReplacing ensemble mean\e[0m"
-                   if [ -f $rundir/$t/$c/$dm/replace_mean/replace_mean.log ]; then
-                     tail -n5 $rundir/$t/$c/$dm/replace_mean/replace_mean.log
-                   fi
-                 fi
-               else
-                 tail -n5 $rundir/$t/$c/$dm/enkf.log
-               fi
-             fi
-           done
+         dart)
+           echo "`tail -n15 $rundir/$t/$c/filter.log`"
            ;;
          4dvar)
            for dm in `/bin/ls $rundir/$t/$c |grep 'd[0-9][0-9]'`; do

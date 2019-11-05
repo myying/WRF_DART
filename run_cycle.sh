@@ -87,9 +87,9 @@ while [[ $NEXTDATE -le $DATE_CYCLE_END ]]; do  #CYCLE LOOP
       $SCRIPT_DIR/module_obsproc.sh &
     fi
 
-    # EnKF
+    ##Run DART ensemble filter
     if $RUN_DART; then
-      $SCRIPT_DIR/module_enkf.sh &
+      $SCRIPT_DIR/module_dart.sh &
     fi
     # 4DVar
     if $RUN_4DVAR; then

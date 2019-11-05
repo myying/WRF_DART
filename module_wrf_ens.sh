@@ -11,7 +11,7 @@ if [[ `cat stat` == "complete" ]]; then exit; fi
 wait_for_module ../icbc
 if [ $DATE == $DATE_START ]; then wait_for_module ../perturb_ic; fi
 if [ $DATE -gt $DATE_START ]; then
-  if $RUN_DART; then wait_for_module ../enkf; fi
+  if $RUN_DART; then wait_for_module ../dart; fi
 fi
 
 echo running > stat
@@ -160,22 +160,21 @@ for NE in `seq 1 $NUM_ENS`; do
   mv $id/wrfout_d01_`wrf_time_string $NEXTDATE` $WORK_DIR/output/$DATE/wrfout_d01_`wrf_time_string $NEXTDATE`_$id
 done
 
-#Calculate ensemble mean for 4DVar fg (next cycle)
-if $RUN_4DVAR; then
-  echo "  Calculating ensemble mean..."
-  cd $rundir
-  for i in $OBS_WIN_MIN; do
-    outdate=`advance_time $NEXTDATE $i`
-    if [[ $outdate -ne $DATE ]]; then
-      for n in `seq 1 $MAX_DOM`; do
-        dm=d`expr $n + 100 |cut -c2-`
+#Calculate ensemble mean for prior (next cycle)
+echo "  Calculating ensemble mean..."
+cd $rundir
+for n in `seq 1 $MAX_DOM`; do
+  dm=d`expr $n + 100 |cut -c2-`
+  ncea $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_??? $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_mean
+  if $RUN_4DVAR; then
+    for i in $OBS_WIN_MIN; do
+      outdate=`advance_time $NEXTDATE $i`
+      if [[ $outdate -ne $DATE ]]; then
         ncea $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_??? $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_mean
-      done
-    else
-      ln -sf $WORK_DIR/fc/$DATE/wrfinput_d01_mean $WORK_DIR/fc/$DATE/wrfinput_d01_`wrf_time_string $outdate`_mean
-    fi
-  done
-fi
+      fi
+    done
+  fi
+done
 
 if $CLEAN; then
   for NE in `seq 1 $NUM_ENS`; do

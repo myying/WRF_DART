@@ -1,7 +1,8 @@
 #!/bin/bash
 . $CONFIG_FILE
-domain_id=$1
-dx=`echo ${DX[$domain_id-1]}/1000 |bc -l`
+#domain_id=$1
+#dx=`echo ${DX[$domain_id-1]}/1000 |bc -l`
+domlist=`seq 1 $MAX_DOM`
 
 ##switch certain obs type off if OBSINT (obs interval) is set less frequent than CYCLE_PERIOD
 #offset=`echo "(${DATE:8:2}*60+${DATE:10:2})%${OBSINT_ATOVS:-$CYCLE_PERIOD}" |bc`
@@ -36,8 +37,8 @@ cat << EOF
    ens_size                 =  ${NUM_ENS},
    obs_sequence_in_name     = "obs_seq.out",
    obs_sequence_out_name    = "obs_seq.final",
-   input_state_file_list    = "input_list_d01.txt", "input_list_d02.txt"
-   output_state_file_list   = "output_list_d01.txt", "output_list_d02.txt"
+   input_state_file_list    = $(for i in $domlist; do printf \"input_list_d0${i}.txt\",\ ; done)
+   output_state_file_list   = $(for i in $domlist; do printf \"output_list_d0${i}.txt\",\ ; done)
    init_time_days           = -1,
    init_time_seconds        = -1,
    first_obs_days           = -1,
@@ -163,7 +164,7 @@ cat << EOF
                              'QICE','0.0','NULL','CLAMP',
                              'QGRAUP','0.0','NULL','CLAMP',
 
-   num_domains = 1,
+   num_domains = $MAX_DOM,
    calendar_type = 3,
    assimilation_period_seconds = 21600,
    vert_localization_coord = 4,
