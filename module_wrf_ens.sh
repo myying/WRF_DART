@@ -33,7 +33,7 @@ echo "  Running WRF ensemble forecast..."
 
 tid=0
 nt=$((total_ntasks/$wrf_ntasks))
-for r in 1 1.5; do
+for r in 1; do
   export time_step_ratio=$r
   for NE in `seq 1 $NUM_ENS`; do
     id=`expr $NE + 1000 |cut -c2-`
