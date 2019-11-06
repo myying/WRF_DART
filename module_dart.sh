@@ -12,7 +12,7 @@ if [[ $JOB_SUBMIT_MODE == 1 ]]; then
   if $RUN_4DVAR; then  wait_for_module ../4dvar ../wrf_window; fi
 fi
 
-echo "  Running DART ..."
+echo "  Running DART..."
 echo running > stat
 
 

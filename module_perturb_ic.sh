@@ -11,13 +11,14 @@ if [[ `cat stat` == "complete" ]]; then exit; fi
 wait_for_module ../icbc
 
 echo running > stat
-echo "  Perturbing IC using WRF 3DVar..."
+echo "  Generating initial ensemble..."
 
 #Run randomcv wrfvar to generate random perturbations
 tid=0
 nt=$((total_ntasks/$var3d_ntasks))
 nm=$NUM_ENS
 
+echo "    running 3dvar random perturb"
 for i in `seq 1 $nm`; do 
   id=`expr $i + 1000 |cut -c2-`
 
@@ -93,7 +94,7 @@ if [ $DATE == $DATE_START ]; then
   if [ $MAX_DOM -gt 1 ]; then
     tid=0
     nt=$((total_ntasks/$wrf_ntasks))
-    echo "  Nestdown perturbations for inner domains..."
+    echo "    nestdown perturbations for inner domains"
     for n in `seq 2 $MAX_DOM`; do
       dm=d`expr $n + 100 |cut -c2-`
       parent_dm=d`expr ${PARENT_ID[$n-1]} + 100 |cut -c2-`

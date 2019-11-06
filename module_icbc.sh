@@ -12,29 +12,29 @@ if [[ $DATE -gt $DATE_START ]]; then
   wait_for_module ../../$DATE_START/icbc
 fi
 
+echo "  Preparing IC BC..."
 echo running > stat
 
 #0. Calculate nested domain locations (centered over storm) and domain move steps
 if $FOLLOW_STORM; then
+  echo "    calculate domain moves"
   #Nested domain location i,j: calculate from tcvatils if first cycle, otherwise get from previous cycle outputs
   if [ $DATE == $DATE_START ]; then
     $SCRIPT_DIR/calc_ij_parent_start.sh $DATE $WORK_DIR/rc/$DATE/ij_parent_start >& follow_storm.log
     watch_file $WORK_DIR/rc/$DATE/ij_parent_start 1 $rundir
     cp $WORK_DIR/rc/$DATE/ij_parent_start $WORK_DIR/rc/$DATE/ij_parent_start_4dvar
   else
-    if $RUN_DART; then
-      i_parent_start="1 "
-      j_parent_start="1 "
-      for n in `seq 2 $MAX_DOM`; do
-        dm=d`expr $n + 100 |cut -c2-`
-        outfile=$WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $DATE`_001
-        watch_file $outfile 1 $rundir
-        i_parent_start="$i_parent_start $(ncdump -h $outfile |grep :I_PARENT_START |awk '{print $3}')"
-        j_parent_start="$j_parent_start $(ncdump -h $outfile |grep :J_PARENT_START |awk '{print $3}')"
-      done
-      echo $i_parent_start > $WORK_DIR/rc/$DATE/ij_parent_start
-      echo $j_parent_start >> $WORK_DIR/rc/$DATE/ij_parent_start
-    fi
+    i_parent_start="1 "
+    j_parent_start="1 "
+    for n in `seq 2 $MAX_DOM`; do
+      dm=d`expr $n + 100 |cut -c2-`
+      outfile=$WORK_DIR/fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $DATE`_001
+      watch_file $outfile 1 $rundir
+      i_parent_start="$i_parent_start $(ncdump -h $outfile |grep :I_PARENT_START |awk '{print $3}')"
+      j_parent_start="$j_parent_start $(ncdump -h $outfile |grep :J_PARENT_START |awk '{print $3}')"
+    done
+    echo $i_parent_start > $WORK_DIR/rc/$DATE/ij_parent_start
+    echo $j_parent_start >> $WORK_DIR/rc/$DATE/ij_parent_start
     if $RUN_4DVAR; then
       i_parent_start="1 "
       j_parent_start="1 "
@@ -84,7 +84,7 @@ fi
 $SCRIPT_DIR/namelist_wps.sh > namelist.wps
 #1. geogrid.exe --------------------------------------------------------------------
 if [[ $DATE == $DATE_START ]]; then
-  echo "  Running geogrid.exe..."
+  echo "    running geogrid.exe"
   ln -sf $WPS_DIR/geogrid/src/geogrid.exe .
   $SCRIPT_DIR/job_submit.sh $wps_ntasks 0 $HOSTPPN ./geogrid.exe >& geogrid.log
   watch_log geogrid.log Successful 10 $rundir
@@ -92,7 +92,7 @@ if [[ $DATE == $DATE_START ]]; then
 fi
 
 #2. ungrib.exe --------------------------------------------------------------------
-echo "  Running ungrib.exe..."
+echo "    running ungrib.exe"
 #Link first guess files (FNL, GFS or ECWMF-interim)
 $WPS_DIR/link_grib.csh $FG_DIR/*
 ln -sf $WPS_DIR/ungrib/Variable_Tables/Vtable.GFS Vtable
@@ -101,14 +101,14 @@ $SCRIPT_DIR/job_submit.sh 1 0 1 ./ungrib.exe >& ungrib.log
 watch_log ungrib.log Successful 10 $rundir
 
 #3. metgrid.exe --------------------------------------------------------------------
-echo "  Running metgrid.exe..."
+echo "    running metgrid.exe"
 ln -fs $WPS_DIR/metgrid/METGRID.TBL.ARW METGRID.TBL
 ln -fs $WPS_DIR/metgrid/src/metgrid.exe .
 $SCRIPT_DIR/job_submit.sh $wps_ntasks 0 $HOSTPPN ./metgrid.exe >& metgrid.log
 watch_log metgrid.log Successful 10 $rundir
 
 #4. real.exe ----------------------------------------------------------------------
-echo "  Running real.exe..."
+echo "    running real.exe"
 $SCRIPT_DIR/namelist_wrf.sh real > namelist.input
 ln -fs $WRF_DIR/main/real.exe .
 $SCRIPT_DIR/job_submit.sh $wps_ntasks 0 $HOSTPPN ./real.exe >& real.log
