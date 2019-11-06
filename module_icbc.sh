@@ -88,8 +88,9 @@ if [[ $DATE == $DATE_START ]]; then
   ln -sf $WPS_DIR/geogrid/src/geogrid.exe .
   $SCRIPT_DIR/job_submit.sh $wps_ntasks 0 $HOSTPPN ./geogrid.exe >& geogrid.log
   watch_log geogrid.log Successful 10 $rundir
-  cp geo_em.d0?.nc $WORK_DIR/rc/.
+  mv geo_em.d??.nc $WORK_DIR/rc/.
 fi
+ln -fs $WORK_DIR/rc/geo_em.d??.nc .
 
 #2. ungrib.exe --------------------------------------------------------------------
 echo "    running ungrib.exe"
