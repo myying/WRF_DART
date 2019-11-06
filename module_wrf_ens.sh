@@ -13,7 +13,6 @@ if [ $DATE == $DATE_START ]; then wait_for_module ../perturb_ic; fi
 if [ $DATE -gt $DATE_START ]; then
   if $RUN_DART; then wait_for_module ../dart; fi
 fi
-
 echo running > stat
 
 export start_date=$DATE
@@ -30,7 +29,6 @@ else
 fi
 
 echo "  Running WRF ensemble forecast..."
-
 tid=0
 nt=$((total_ntasks/$wrf_ntasks))
 for r in 1; do
@@ -40,7 +38,6 @@ for r in 1; do
     if [[ ! -d $id ]]; then mkdir $id; fi
     touch $id/rsl.error.0000
     if [[ `tail -n5 $id/rsl.error.0000 |grep SUCCESS` ]]; then continue; fi
-
     cd $id
 
     ####Update and perturb BC
@@ -152,14 +149,6 @@ for NE in `seq 1 $NUM_ENS`; do
   done
 done
 
-for NE in `seq 1 $NUM_ENS`; do
-  id=`expr $NE + 1000 |cut -c2-`
-  if $RUN_DART; then
-    mv $id/wrfout_d01_`wrf_time_string $DATE` $WORK_DIR/output/$DATE/wrfout_d01_`wrf_time_string $DATE`_$id
-  fi
-  mv $id/wrfout_d01_`wrf_time_string $NEXTDATE` $WORK_DIR/output/$DATE/wrfout_d01_`wrf_time_string $NEXTDATE`_$id
-done
-
 #Calculate ensemble mean for prior (next cycle)
 echo "  Calculating ensemble mean..."
 cd $rundir
@@ -180,7 +169,7 @@ if $CLEAN; then
   for NE in `seq 1 $NUM_ENS`; do
     id=`expr $NE + 1000 |cut -c2-`
     #rm -f $rundir/$id/wrfout* &
-    rm ???/rsl.* &
+    rm $id/rsl.* &
   done
 fi
 
