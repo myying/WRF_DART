@@ -7,7 +7,7 @@ if [ ! -d $rundir ]; then echo "$rundir doesn't exist"; exit; fi
 for t in `ls $rundir |grep 20 |tail -n5`; do
   echo "==== `wrf_time_string $t` ===="
 
-for c in obsproc icbc dart 4dvar perturb_ic wrf_ens wrf_ens_window1 wrf_window wrf_window1 wrf; do
+for c in obsproc icbc dart perturb_ic wrf_ens wrf; do
   if [ -d $rundir/$t/$c ]; then
      stat=`cat $rundir/$t/$c/stat`
      printf "%12s" "$c"
@@ -40,12 +40,6 @@ for c in obsproc icbc dart 4dvar perturb_ic wrf_ens wrf_ens_window1 wrf_window w
          wrf)
            echo "`tail -n5 $rundir/$t/$c/rsl.error.0000`"
            ;;
-         wrf_window)
-           echo "`tail -n5 $rundir/$t/$c/rsl.error.0000`"
-           ;;
-         wrf_window1)
-           echo "`tail -n5 $rundir/$t/$c/rsl.error.0000`"
-           ;;
          obsproc)
            echo "`tail -n5 $rundir/$t/$c/obsproc.log`"
            ;;
@@ -57,75 +51,7 @@ for c in obsproc icbc dart 4dvar perturb_ic wrf_ens wrf_ens_window1 wrf_window w
          dart)
            echo "`tail -n15 $rundir/$t/$c/filter.log`"
            ;;
-         4dvar)
-           for dm in `/bin/ls $rundir/$t/$c |grep 'd[0-9][0-9]'`; do
-             echo -e "\e[7m$dm\e[0m"
-             if [ -f $rundir/$t/$c/$dm/stage0 ]; then
-               if [ `cat $rundir/$t/$c/$dm/stage0` == "complete" ]; then
-                 echo -e "\e[7mStage0\e[0m: Preparing input files ...................complete"
-               else
-                 echo -e "\e[7mStage0\e[0m: Preparing input files ..................."
-               fi
-               if [ -f $rundir/$t/$c/$dm/stage1 ]; then 
-                 if [ `cat $rundir/$t/$c/$dm/stage1` == "complete" ]; then
-                   echo -e "\e[7mStage1\e[0m: First outer loop ........................complete"
-                 else
-                   echo -e "\e[7mStage1\e[0m: First outer loop ........................"
-                 fi
-               fi
-               for i in `seq 1 100`; do
-                 if [ -f $rundir/$t/$c/$dm/stage2_inner$i ]; then
-                   if [ `cat $rundir/$t/$c/$dm/stage2_inner$i` == "complete" ]; then
-                     if [ -f $rundir/$t/$c/$dm/stage2_rsl.error.0000 ]; then
-                       nit=`cat $rundir/$t/$c/$dm/stage2_rsl.error.0000 |grep 'back from adjoint integrate' |wc -l`
-                     else
-                       nit=0
-                     fi
-                     echo -e "\e[7mStage2\e[0m: Extra inner loop ($i), iterations = $nit ....complete" 
-                   else
-                     if [ -f $rundir/$t/$c/$dm/rsl.error.0000 ]; then 
-                       nit=`cat $rundir/$t/$c/$dm/rsl.error.0000 |grep 'back from adjoint integrate' |wc -l`
-                     else
-                       nit=0
-                     fi
-                     echo -e "\e[7mStage2\e[0m: Extra inner loop ($i), iterations = $nit ...."
-                   fi
-                 fi
-                 if [ -f $rundir/$t/$c/$dm/stage2_outer$i ]; then
-                   if [ `cat $rundir/$t/$c/$dm/stage2_outer$i` == "complete" ]; then
-                     echo -e "\e[7mStage2\e[0m: Extra outer loop ($i) ....complete"
-                   else
-                     echo -e "\e[7mStage2\e[0m: Extra outer loop ($i) ...."
-                   fi             
-                 fi
-               done
-               if [ -f $rundir/$t/$c/$dm/rsl.error.0000 ]; then
-                 tail -n5 $rundir/$t/$c/$dm/rsl.error.0000
-               fi
-             fi
-           done
-           ;;
          wrf_ens)
-           for m in `/bin/ls $rundir/$t/$c |grep '^[0-9][0-9][0-9]$'`; do
-             rsltail=''
-             if [[ -f $rundir/$t/$c/$m/rsl.error.0000 ]]; then
-               rsltail=`tail -n1 $rundir/$t/$c/$m/rsl.error.0000`
-             fi
-             if [[ -z $rsltail ]]; then mstat="\e[0;31mwaiting\e[0m"; fi
-             if [[ $rsltail ]]; then mstat="\e[0;32mrunning\e[0m: $rsltail"; fi
-             if [[ `echo $rsltail |grep SUCCESS` ]]; then mstat=complete; fi
-             echo -e "$m ($mstat)"
-           done
-           for i in `/bin/ls $rundir/$t/$c |grep mean`; do
-             if [ -d $rundir/$t/$c/$i ]; then
-               echo -e "\e[7mCalculating $i\e[0m"
-               if [ -f $rundir/$t/$c/$i/ensemble_mean.log ]; then
-                 tail -n5 $rundir/$t/$c/$i/ensemble_mean.log
-               fi
-             fi
-           done
-           ;;
-         wrf_ens_window1)
            for m in `/bin/ls $rundir/$t/$c |grep '^[0-9][0-9][0-9]$'`; do
              rsltail=''
              if [[ -f $rundir/$t/$c/$m/rsl.error.0000 ]]; then

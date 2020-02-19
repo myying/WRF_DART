@@ -35,7 +35,7 @@ if [[ $HOSTTYPE == "cheyenne" ]]; then
     nodes=`echo "($n+$ppn-1)/$ppn" |bc`
     jobname=`basename $exe |awk -F. '{print $1}'`
     queue="regular"
-    wtime="02:00:00"
+    wtime="06:00:00"
     cat << EOF > run_$jobname.sh
 #!/bin/bash
 #PBS -A $HOSTACCOUNT
@@ -59,20 +59,6 @@ EOF
     done
   fi
 
-fi
-
-###stampede TACC UTEXAS
-if [[ $HOSTTYPE == "stampede2" ]]; then
-
-  if [ $JOB_SUBMIT_MODE == 1 ]; then
-
-    export SLURM_NTASKS=$((ppn*$SLURM_NNODES))
-    export SLURM_NPROCS=$((ppn*$SLURM_NNODES))
-    export SLURM_TACC_CORES=$((ppn*$SLURM_NNODES))
-    export SLURM_TASKS_PER_NODE="$ppn(x$SLURM_NNODES)"
-    ibrun -n $n -o $o $exe
-
-  fi
 fi
 
 ###define your own mpiexec here if needed:

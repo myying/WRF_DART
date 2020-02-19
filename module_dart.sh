@@ -9,7 +9,6 @@ if [[ `cat stat` == "complete" ]]; then exit; fi
 wait_for_module ../../$PREVDATE/wrf_ens ../obsproc
 if [[ $JOB_SUBMIT_MODE == 1 ]]; then
   wait_for_module ../icbc
-  if $RUN_4DVAR; then  wait_for_module ../4dvar ../wrf_window; fi
 fi
 
 echo "  Running DART..."

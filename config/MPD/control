@@ -1,25 +1,14 @@
 ##The following is a detailed description of each configuration file entry
 #work flow control
- RUN_DART=false               #if true, run EnKF component
- RUN_4DVAR=false	             #if true, run 4DVar component
-                             #if both RUN_DART and RUN_4DVAR are true, run a hybrid E4DVar
- RUN_ENVAR=false             #if true, run 4DEnVar instead of E4DVar
-
- FOLLOW_STORM=true           #if true, nested domain will be preset to move following the path of 
- STORM_ID=ep202015           #storm id, format: basin (al) num (13) year (2010)
-
- MULTI_PHYS_ENS=false         #if true, use a multi-physics ensemble
- MULTI_INC=true              #if true, run a multi-incremental version of 4DVar
- DECIMATION_FACTOR=3         #ratio of high/low resolution in multi-incremental 4DVar
-
+ RUN_DART=true               #if true, run EnKF component
  CLEAN=true                  #if true, delete unwanted wrfout files in rundir
 
 #experiment design
- EXP_NAME=Patricia              #name of experiment
- DATE_START=201510211200        #initial date, need to have available first guess (0 6 12 18 h)
- DATE_END=201510231200          #end date
- DATE_CYCLE_START=201510211300  #date of first assimilation cycle, also need first guess available
- DATE_CYCLE_END=201510231100    #date of final assimilation cycle
+ EXP_NAME=MPD/control              #name of experiment
+ DATE_START=201906131800        #initial date, need to have available first guess (0 6 12 18 h)
+ DATE_END=201906141800          #end date
+ DATE_CYCLE_START=201906140000  #date of first assimilation cycle, also need first guess available
+ DATE_CYCLE_END=201906141200    #date of final assimilation cycle
 
 #time control: unit=minutes
  CYCLE_PERIOD=60                #interval among cycles
@@ -39,18 +28,15 @@
  WORK_DIR=$SCRATCH/$EXP_NAME               #path to your experiment work directory
  SCRIPT_DIR=$WORK/WRF_DART                 #path to this script set
  CODE_DIR=$WORK/code                       #path to codes
- DATA_DIR=$WORK/data/Patricia              #path to observations
+ DATA_DIR=$WORK/data/MPD              #path to observations
  WPS_DIR=$CODE_DIR/WPSV3.9                 #WPS package (contains geogrid.exe, ungrib.exe, metgrid.exe)
  WRF_DIR=$CODE_DIR/WRFV3.9_presetmove      #WRF package (contains real.exe, wrf.exe, ndown.exe and runtime files)
  WRF_BC_DIR=$CODE_DIR/WRF_BC_v2.1_alltime  #path to update_wrf_bc.exe
  WRFDA_DIR=$CODE_DIR/WRFDAV3.9.1           #WRFDA package (contains da_wrfvar.exe and runtime files)
- MULTI_INC_DIR=$CODE_DIR/MULTI_INC         #path to da_decimation.exe, da_bdy.exe
  DART_DIR=$CODE_DIR/DART                   #path to enkf.mpi
  FG_DIR=$DATA_DIR/fnl                      #path to first guess files
  GEOG_DIR=$WORK/data/geog                  #path to geog, needed by WPS
  BE_DIR=$DATA_DIR                          #path to be.dat
- TCVITALS_DIR=$WORK/data/tcvitals          #tcvitals data files
- TCV_INTERVAL=360
 
 #domain setup
  TWO_WAY_NESTING=true         #if true, set feedback=1 in namelist.input for WRF
@@ -86,12 +72,11 @@
  BLDT=(0 0 0)
  CU_PHYSICS=(3 0 0)
  CUDT=(5 5 5)
- SST_UPDATE=1
 
 #DART options
- NUM_ENS=10                      #ensemble size
+ NUM_ENS=60                      #ensemble size
  ADAPTIVE_INFLATION=true
- UPDATE_VAR=(U V W PH T MU QVAPOR QCLOUD QRAIN QICE QSNOW QGRAUP U10 V10 T2 Q2 PSFC)
+ UPDATE_VAR=(U V W P PH T MU QVAPOR QCLOUD QRAIN QICE QSNOW QGRAUP U10 V10 T2 Q2 PSFC)
 
 #data sources
  INCLUDE_LITTLE_R=true           #include LITTLE_R formatted data as input to obsproc.exe
@@ -131,7 +116,7 @@
  THIN_SFCSHP=0
  THIN_SPSSMI=0
  THIN_ATOVS=0
- THIN_SATWND=10
+ THIN_SATWND=0
  THIN_GPSPW=0
  THIN_RADAR=0
 
@@ -157,16 +142,8 @@
  LEN_SCALING4=1.0
  LEN_SCALING5=1.0
 
-#WRFDA options (for 4DVar)
- MAX_EXT_ITS=1
- NTMAX=80
- VAR4D_LBC=false
-#HYBRID options (alpha cv method related)
- ALPHACV_METHOD=2
- JE_FACTOR=1.25
-
 #CPU usage
- HOSTACCOUNT=P54048000
+ HOSTACCOUNT=NEOL0012
  HOSTPPN=32            #number of CPUs per node on host machines
  HOSTTYPE=cheyenne     #host type (used in job_submit.sh, currently supports "jet" and "stampede")
  JOB_SUBMIT_MODE=2     # 1 - submit run_cycle.sh to queue as a single job. The scheduling of

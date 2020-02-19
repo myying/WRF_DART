@@ -164,17 +164,6 @@ echo "/"
 #if running multi-physics ensemble read the physics options from wrfinput files
 #else get options from config file
 echo "&physics"
-if $MULTI_PHYS_ENS && [ $use_for == "wrf" ]; then
-cat << EOF
-mp_physics         = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :MP_PHYSICS |awk '{print $3}'), ; done)
-ra_lw_physics      = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :RA_LW_PHYSICS |awk '{print $3}'), ; done)
-ra_sw_physics      = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :RA_SW_PHYSICS |awk '{print $3}'), ; done)
-sf_sfclay_physics  = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :SF_SFCLAY_PHYSICS |awk '{print $3}'), ; done)
-sf_surface_physics = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :SF_SURFACE_PHYSICS |awk '{print $3}'), ; done)
-bl_pbl_physics     = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :BL_PBL_PHYSICS |awk '{print $3}'), ; done)
-cu_physics         = $(for i in $domlist; do printf $(ncdump -h wrfinput_d$(expr $i + 100 |cut -c2-) |grep :CU_PHYSICS |awk '{print $3}'), ; done)
-EOF
-else
 cat << EOF
 mp_physics         = $(for i in $domlist; do printf ${MP_PHYSICS[$i-1]}, ; done)
 ra_lw_physics      = $(for i in $domlist; do printf ${RA_LW_PHYSICS[$i-1]}, ; done)
@@ -184,7 +173,6 @@ sf_surface_physics = $(for i in $domlist; do printf ${SF_SURFACE_PHYSICS[$i-1]},
 bl_pbl_physics     = $(for i in $domlist; do printf ${BL_PBL_PHYSICS[$i-1]}, ; done)
 cu_physics         = $(for i in $domlist; do printf ${CU_PHYSICS[$i-1]}, ; done)
 EOF
-fi
 
 cat << EOF
 radt               = $(for i in $domlist; do printf `echo "${RADT[$i-1]} * $thin_factor" |bc`, ; done)
@@ -194,7 +182,7 @@ EOF
 
 cat << EOF
 mp_zero_out        = 2,
-sst_update         = ${SST_UPDATE},
+sst_update         = ${SST_UPDATE:-0},
 sst_skin           = ${SST_SKIN:-0},
 EOF
 

@@ -17,16 +17,9 @@ echo running > stat
 
 export start_date=$DATE
 export run_minutes=$run_minutes_cycle
-if $RUN_4DVAR; then
-  export inputout_interval=`abs $OBS_WIN_MIN`
-  export inputout_begin=`echo "$run_minutes + $OBS_WIN_MIN" |bc`
-  export inputout_end=$run_minutes
-  export wrfout_interval=`gcd $inputout_begin $inputout_end`
-else
-  export inputout_interval=$run_minutes
-  export inputout_begin=0
-  export inputout_end=$run_minutes
-fi
+export inputout_interval=$run_minutes
+export inputout_begin=0
+export inputout_end=$run_minutes
 
 echo "  Running WRF ensemble forecast..."
 tid=0
@@ -88,7 +81,7 @@ for r in 1; do
 
     for n in `seq 1 $MAX_DOM`; do
       dm=d`expr $n + 100 |cut -c2-`
-      if $RUN_DART; then
+      if $RUN_DART || [[ $DATE == $DATE_START ]]; then
         ln -fs ../../../../fc/$DATE/wrfinput_${dm}_$id wrfinput_$dm
       else
         ln -fs ../../../../fc/$PREVDATE/wrfinput_${dm}_`wrf_time_string $DATE`_$id wrfinput_$dm
@@ -96,23 +89,6 @@ for r in 1; do
     done
 		ln -fs ../../../../fc/wrfbdy_d01 wrfbdy_d01
 
-    if $MULTI_PHYS_ENS; then
-      if [ $DATE -gt $DATE_START ]; then
-        $SCRIPT_DIR/multi_physics_set.sh $id >& multi_physics_set.log
-      fi
-    fi
-
-    if [[ $SST_UPDATE == 1 ]]; then
-      for n in `seq 1 $MAX_DOM`; do
-        dm=d`expr $n + 100 |cut -c2-`
-        ln -fs ../../../../rc/$DATE_START/wrflowinp_$dm .
-      done
-    fi
-
-    if $FOLLOW_STORM; then
-      cp $WORK_DIR/rc/$DATE/ij_parent_start .
-      cp $WORK_DIR/rc/$DATE/domain_moves .
-    fi
     $SCRIPT_DIR/namelist_wrf.sh wrf > namelist.input
     $SCRIPT_DIR/job_submit.sh $wrf_ntasks $((tid*$wrf_ntasks)) $HOSTPPN ./wrf.exe >& wrf.log &
 
@@ -130,12 +106,7 @@ done
 for NE in `seq 1 $NUM_ENS`; do
   id=`expr $NE + 1000 |cut -c2-`
   watch_log $id/rsl.error.0000 SUCCESS 1 $rundir
-  if $RUN_4DVAR; then
-    e_offset="$OBS_WIN_MIN 0"
-  else
-    e_offset="0"
-  fi
-  for i in $e_offset; do
+  for i in 0; do
     outdate=`advance_time $NEXTDATE $i`
     outfile=$id/wrfinput_d01_`wrf_time_string $outdate`
     mv $outfile $WORK_DIR/fc/$DATE/wrfinput_d01_`wrf_time_string $outdate`_$id
@@ -155,14 +126,6 @@ cd $rundir
 for n in `seq 1 $MAX_DOM`; do
   dm=d`expr $n + 100 |cut -c2-`
   ncea $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_??? $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_mean
-  if $RUN_4DVAR; then
-    for i in $OBS_WIN_MIN; do
-      outdate=`advance_time $NEXTDATE $i`
-      if [[ $outdate -ne $DATE ]]; then
-        ncea $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_??? $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $outdate`_mean
-      fi
-    done
-  fi
 done
 
 if $CLEAN; then

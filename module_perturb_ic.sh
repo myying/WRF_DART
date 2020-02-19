@@ -106,9 +106,6 @@ if [ $DATE == $DATE_START ]; then
         ln -fs ../wrfinput_d0? .
         export run_minutes=0
         export start_date=$DATE
-        if $FOLLOW_STORM; then
-          cp $WORK_DIR/rc/$DATE/ij_parent_start .
-        fi
         $SCRIPT_DIR/namelist_wrf.sh ndown $n > namelist.input
         rm -f wrfinput_d0?
         ln -fs $WRF_DIR/run/ndown.exe .
@@ -131,14 +128,6 @@ if [ $DATE == $DATE_START ]; then
     done
   fi
 
-  #if using multi-physics ensemble, randomly assign physics options
-  if $MULTI_PHYS_ENS; then
-    for NE in `seq 1 $NUM_ENS`; do
-      id=`expr $NE + 1000 |cut -c2-`
-      $SCRIPT_DIR/multi_physics_randraw.sh $WORK_DIR/fc/$DATE/wrfinput_d??_$id >& multi_physics_draw.log
-    done
-#    $SCRIPT_DIR/multi_physics_draw.sh $NUM_ENS $WORK_DIR/fc/$DATE >& multi_physics_draw.log
-  fi
 fi
 
 echo complete > stat

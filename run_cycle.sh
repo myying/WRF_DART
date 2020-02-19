@@ -10,7 +10,7 @@ source ~/.bashrc
 
 #load configuration files, functions, parameters
 cd $WORK/WRF_DART
-export CONFIG_FILE=$WORK/WRF_DART/config/Patricia
+export CONFIG_FILE=$WORK/WRF_DART/config/$1
 . $CONFIG_FILE
 . util.sh
 
@@ -75,31 +75,17 @@ while [[ $NEXTDATE -le $DATE_CYCLE_END ]]; do  #CYCLE LOOP
   if [ $NEXTDATE -le $DATE_CYCLE_END ]; then
     $SCRIPT_DIR/module_wrf_ens.sh &
   fi
-  # First deterministic run for 4DVar
-  if $RUN_4DVAR && ! $RUN_DART && [ $DATE == $DATE_START ]; then
-    $SCRIPT_DIR/module_wrf_window.sh &
-  fi
 
   # Data assimilation for each cycle
   if [ $DATE -ge $DATE_CYCLE_START ] && [ $DATE -le $DATE_CYCLE_END ]; then
     # Processing observations
-    if $RUN_DART || $RUN_4DVAR; then
+    if $RUN_DART; then
       $SCRIPT_DIR/module_obsproc.sh &
     fi
 
     ##Run DART ensemble filter
     if $RUN_DART; then
       $SCRIPT_DIR/module_dart.sh &
-    fi
-    # 4DVar
-    if $RUN_4DVAR; then
-      $SCRIPT_DIR/module_wrf_window1.sh &
-      $SCRIPT_DIR/module_4dvar.sh &
-      $SCRIPT_DIR/module_wrf_window.sh &
-    fi
-    # EnVar need an extra ensemble run through the obs window to get perturbations
-    if $RUN_ENVAR; then
-      $SCRIPT_DIR/module_wrf_ens_window1.sh &
     fi
   fi
   wait

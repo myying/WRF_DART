@@ -40,23 +40,13 @@ if $INCLUDE_LITTLE_R; then
       rm obs.${d:0:10}
     fi
 
-    #AMV
-    #if [ -f $DATA_DIR/amv/${d:0:6}/amv.${d:0:10} ]; then
-      #cat $DATA_DIR/amv/${d:0:6}/amv.${d:0:10} >> obs.raw
-    #fi
+    #link more obs here
   done
 fi
 
 echo "    running obsproc.exe"
-for var_type in 3DVAR 4DVAR; do
-  case $var_type in
-    3DVAR)
-      if ! $RUN_DART; then continue; fi
-    ;;
-    4DVAR)
-      if ! $RUN_4DVAR; then continue; fi
-    ;;
-  esac
+for var_type in 3DVAR; do
+  if ! $RUN_DART; then continue; fi
   echo > obsproc.log
   export use_for=$var_type
   $SCRIPT_DIR/namelist_obsproc.sh > namelist.obsproc
