@@ -125,6 +125,7 @@ echo "  Calculating ensemble mean..."
 cd $rundir
 for n in `seq 1 $MAX_DOM`; do
   dm=d`expr $n + 100 |cut -c2-`
+  rm -f $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_mean
   ncea $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_??? $WORK_DIR/fc/$DATE/wrfinput_${dm}_`wrf_time_string $NEXTDATE`_mean
 done
 

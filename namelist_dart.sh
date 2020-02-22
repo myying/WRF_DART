@@ -45,8 +45,8 @@ cat << EOF
    first_obs_seconds        = -1,
    last_obs_days            = -1,
    last_obs_seconds         = -1,
-   num_output_state_members = 20,
-   num_output_obs_members   = 20,
+   num_output_state_members = $NUM_ENS,
+   num_output_obs_members   = $NUM_ENS,
    output_interval          = 1,
    num_groups               = 1,
    output_forward_op_errors = .false.,
@@ -59,15 +59,15 @@ cat << EOF
    output_sd                = .true.
    write_all_stages_at_end  = .true.
 
-   inf_flavor                  = 0,                      0,
-   inf_initial_from_restart    = .false.,                 .false.,
-   inf_sd_initial_from_restart = .false.,                 .false.,
-   inf_initial                 = 1.0,                   1.12,
-   inf_sd_initial              = 0.60,                   0.50,
-   inf_damping                 = 0.9,                   1.00,
-   inf_lower_bound             = 1.0,                    1.0,
+   inf_flavor                  = 0,                    0,
+   inf_initial_from_restart    = .false.,              .false.,
+   inf_sd_initial_from_restart = .false.,              .false.,
+   inf_initial                 = 1.0,                  1.12,
+   inf_sd_initial              = 0.60,                 0.50,
+   inf_damping                 = 0.9,                  1.00,
+   inf_lower_bound             = 1.0,                  1.0,
    inf_upper_bound             = 10000.0,              10000.0,
-   inf_sd_lower_bound          = 0.60,                   0.10
+   inf_sd_lower_bound          = 0.60,                 0.10,
 /
 
 &quality_control_nml
@@ -110,7 +110,7 @@ cat << EOF
 &closest_member_tool_nml
    input_file_name        = 'filter_ic_new',
    output_file_name       = 'closest_restart',
-   ens_size               = 50,
+   ens_size               = $NUM_ENS,
    single_restart_file_in = .false.,
    difference_method      = 4,
 /
@@ -342,8 +342,6 @@ cat << EOF
    rho_snow                    =     100.0,
 /
 
-
-
 &gts_to_dart_nml
    gts_file              = 'gts_obsout.dat'
    obs_seq_out_file_name = 'obs_seq.out'
@@ -372,6 +370,15 @@ cat << EOF
    num_thin_qscat        = 100
 /
 
+&fill_inflation_restart_nml
+   write_prior_inf       = .TRUE.
+   prior_inf_mean        = 1.01
+   prior_inf_sd          = 0.6
+   write_post_inf       = .TRUE.
+   post_inf_mean        = 1.01
+   post_inf_sd          = 0.6
+   input_state_files     = $(for i in $domlist; do printf \"wrfinput_d0${i}\",\ ; done)
+/
 EOF
 
 #&osse

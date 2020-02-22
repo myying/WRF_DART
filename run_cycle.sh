@@ -1,11 +1,4 @@
 #!/bin/bash
-#PBS -N run_cycle
-#PBS -A P54048000
-#PBS -l select=4:ncpus=32:mpiprocs=32
-#PBS -l walltime=06:00:00
-#PBS -q regular
-#PBS -j oe
-#PBS -o log
 source ~/.bashrc
 
 #load configuration files, functions, parameters
