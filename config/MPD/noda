@@ -1,14 +1,14 @@
 ##The following is a detailed description of each configuration file entry
 #work flow control
- RUN_DART=true               #if true, run EnKF component
- CLEAN=true                  #if true, delete unwanted wrfout files in rundir
+ RUN_DART=false               #if true, run EnKF component
+ CLEAN=false                  #if true, delete unwanted wrfout files in rundir
 
 #experiment design
- EXP_NAME=MPD/control              #name of experiment
+ EXP_NAME=MPD/noda              #name of experiment
  DATE_START=201906140000        #initial date, need to have available first guess (0 6 12 18 h)
  DATE_END=201906141800          #end date
- DATE_CYCLE_START=201906140300  #date of first assimilation cycle, also need first guess available
- DATE_CYCLE_END=201906140800    #date of final assimilation cycle
+ DATE_CYCLE_START=201906141200  #date of first assimilation cycle, also need first guess available
+ DATE_CYCLE_END=201906141200    #date of final assimilation cycle
 
 #time control: unit=minutes
  CYCLE_PERIOD=15                #interval among cycles

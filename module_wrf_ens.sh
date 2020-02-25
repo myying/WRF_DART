@@ -132,7 +132,7 @@ done
 if $CLEAN; then
   for NE in `seq 1 $NUM_ENS`; do
     id=`expr $NE + 1000 |cut -c2-`
-    #rm -f $rundir/$id/wrfout* &
+    rm -f $rundir/$id/wrfout* &
     rm $id/rsl.* &
   done
 fi

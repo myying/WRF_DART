@@ -40,9 +40,9 @@ if $ADAPTIVE_INFLATION; then
     $DART_DIR/models/wrf/work/fill_inflation_restart >& fill_inflation_restart.log
     for n in `seq 1 $MAX_DOM`; do
       dm=d`expr $n + 100 |cut -c2-`
-      for name in prior post; do
-        mv ${name}_inflation_mean_${dm}.nc $WORK_DIR/fc/$DATE/input_${name}inf_mean_${dm}.nc
-        mv ${name}_inflation_sd_${dm}.nc $WORK_DIR/fc/$DATE/input_${name}inf_sd_${dm}.nc
+      for name in prior; do
+        mv input_${name}inf_mean_${dm}.nc $WORK_DIR/fc/$DATE/input_${name}inf_mean_${dm}.nc
+        mv input_${name}inf_sd_${dm}.nc $WORK_DIR/fc/$DATE/input_${name}inf_sd_${dm}.nc
         ln -fs $WORK_DIR/fc/$DATE/input_${name}inf_mean_${dm}.nc .
         ln -fs $WORK_DIR/fc/$DATE/input_${name}inf_sd_${dm}.nc .
       done
@@ -50,7 +50,7 @@ if $ADAPTIVE_INFLATION; then
   else
     for n in `seq 1 $MAX_DOM`; do
       dm=d`expr $n + 100 |cut -c2-`
-      for name in prior post; do
+      for name in prior; do
         ln -fs $WORK_DIR/fc/$PREVDATE/output_${name}inf_mean_${dm}.nc input_${name}inf_mean_${dm}.nc
         ln -fs $WORK_DIR/fc/$PREVDATE/output_${name}inf_sd_${dm}.nc input_${name}inf_sd_${dm}.nc
       done
@@ -79,7 +79,7 @@ done
 if $ADAPTIVE_INFLATION; then
   for n in `seq 1 $MAX_DOM`; do
     dm=d`expr $n + 100 |cut -c2-`
-    for name in prior post; do
+    for name in prior; do
       mv output_${name}inf_mean_${dm}.nc $WORK_DIR/fc/$DATE/.
       mv output_${name}inf_sd_${dm}.nc $WORK_DIR/fc/$DATE/.
     done
