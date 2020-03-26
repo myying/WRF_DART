@@ -1,0 +1,145 @@
+##The following is a detailed description of each configuration file entry
+#work flow control
+ RUN_DART=true               #if true, run EnKF component
+ CLEAN=true                  #if true, delete unwanted wrfout files in rundir
+
+#experiment design
+ EXP_NAME=MPD/assim_MPD              #name of experiment
+ DATE_START=201906140000        #initial date, need to have available first guess (0 6 12 18 h)
+ DATE_END=201906141800          #end date
+ DATE_CYCLE_START=201906140300  #date of first assimilation cycle, also need first guess available
+ DATE_CYCLE_END=201906140800    #date of final assimilation cycle
+
+#time control: unit=minutes
+ CYCLE_PERIOD=15                #interval among cycles
+ WRFOUT_INTERVAL=(15 15 15)     #interval of wrfout times
+ LBC_INTERVAL=180               #interval of available first guess files
+
+ OBS_WIN_MIN=-8                #observation window start offset
+ OBS_WIN_MAX=8                 #observation window end offset
+ MINUTES_PER_SLOT=4            #bin size, defines how may time slots are there in a window
+                                #Observation window is usually set to +-1/2 CYCLE_PERIOD, so that
+                                #EnKF analysis date locates in the center of the window.
+ FORECAST_TO_END=false          #if true, determ forecast will run from analysis time to DATE_END
+ FORECAST_MINUTES=360           #default length of forecast from analysis
+
+#directories
+ WORK_DIR=$SCRATCH/$EXP_NAME               #path to your experiment work directory
+ SCRIPT_DIR=$WORK/WRF_DART                 #path to this script set
+ CODE_DIR=$WORK/code                       #path to codes
+ DATA_DIR=$WORK/data/MPD              #path to observations
+ WPS_DIR=$CODE_DIR/WPS-4.1                 #WPS package (contains geogrid.exe, ungrib.exe, metgrid.exe)
+ WRF_DIR=$CODE_DIR/WRFV3.9_presetmove      #WRF package (contains real.exe, wrf.exe, ndown.exe and runtime files)
+ WRF_BC_DIR=$CODE_DIR/WRF_BC_v2.1_alltime  #path to update_wrf_bc.exe
+ WRFDA_DIR=$CODE_DIR/WRFDAV3.9.1           #WRFDA package (contains da_wrfvar.exe and runtime files)
+ DART_DIR=$CODE_DIR/DART                   #path to enkf.mpi
+ FG_DIR=$DATA_DIR/fnl                      #path to first guess files
+ GEOG_DIR=$WORK/data/geog_new                  #path to geog, needed by WPS
+ BE_DIR=$DATA_DIR                          #path to be.dat
+
+#domain setup
+ TWO_WAY_NESTING=true         #if true, set feedback=1 in namelist.input for WRF
+ MAX_DOM=2                    #the following options are the same as in namelist.input for WRF
+ TIME_STEP=(60 12 4)
+ TIME_STEP_RATIO=(1 5 3)
+ E_WE=(251 401 301)
+ E_SN=(181 401 301)
+ E_VERT=(43 43 43)
+ DX=(15000 3000 1000)
+ DY=(15000 3000 1000)
+ PARENT_ID=(0 1 2)
+ GRID_RATIO=(1 5 3)
+ I_PARENT_START=(1 80 101)
+ J_PARENT_START=(1 50 101)
+ NUM_METGRID_LEVELS=34
+ MAP_PROJ="lambert"
+ REF_LAT=36.5
+ REF_LON=-97.5
+ STAND_LON=-97.5
+ TRUELAT1=40.0
+ TRUELAT2=30.0
+ P_TOP=1000
+
+#physics
+ MP_PHYSICS=(8 8 8)
+ RA_LW_PHYSICS=(1 1 1)
+ RA_SW_PHYSICS=(1 1 1)
+ RADT=(27 9 3)
+ SF_SFCLAY_PHYSICS=(1 1 1)
+ SF_SURFACE_PHYSICS=(1 1 1)
+ BL_PBL_PHYSICS=(1 1 1)
+ BLDT=(0 0 0)
+ CU_PHYSICS=(3 0 0)
+ CUDT=(5 5 5)
+ SST_UPDATE=0
+
+#DART options
+ NUM_ENS=60                      #ensemble size
+ ADAPTIVE_INFLATION=true
+ UPDATE_VAR=(U V W PH T MU QVAPOR QCLOUD QRAIN QICE QSNOW QGRAUP U10 V10 T2 Q2 PSFC)
+
+#data sources
+ INCLUDE_LITTLE_R=false           #include LITTLE_R formatted data as input to obsproc.exe
+ INCLUDE_MPD=true
+
+#Some of the following switches are shared in namelist_enkf and namelist_wrfvar to select certain observation types
+#                              in  namelist.enkf      in wrfvar namelist.input
+ #USE_SURFOBS=true               #  use_surface               /
+ #USE_SOUNDOBS=true               #  use_sounding         use_soundobs
+ #USE_PROFILEROBS=true            #  use_profiler         use_profilerobs
+ #USE_AIREPOBS=true               #  use_aircft           use_airepobs
+ #USE_METAROBS=true               #  use_metar            use_metarobs
+ #USE_SHIPSOBS=true               #  use_sfcshp           use_shipsobs
+ #USE_SSMIOBS=false               #  use_spssmi                /
+ #USE_GPSPWOBS=false              #  use_gpspw            use_gpspwobs
+ #USE_ATOVS=false                 #  use_atovs                 /
+ #USE_GEOAMVOBS=true              #  use_satwnd           use_geoamvobs
+
+#data thinning coef for EnKF
+ #THIN_SURFACE=0
+ #THIN_SOUNDING=0
+ #THIN_PROFILER=0
+ #THIN_AIRCFT=0
+ #THIN_METAR=0
+ #THIN_SFCSHP=0
+ #THIN_SPSSMI=0
+ #THIN_ATOVS=0
+ #THIN_SATWND=0
+ #THIN_GPSPW=0
+ #THIN_RADAR=0
+
+#localization distance (km for HROI, # of layers for VROI) for EnKF
+ #HROI_SFC=400                 #horizontal radius of influence for surface obs
+ #HROI_UPPER=1200               #horizontal radius of influence for upper air obs
+ #VROI=15                      #vertical radius of influence
+
+#WRFDA options
+ CV_OPTIONS=3                 #3 -   uses be.dat.cv3
+                              #5/6 - uses be.dat from run_gen_be.sh ($BE_DIR)
+ VAR_SCALING1=0.1
+ VAR_SCALING2=0.1
+ VAR_SCALING3=0.1
+ VAR_SCALING4=0.1
+ VAR_SCALING5=0.1
+ LEN_SCALING1=1.0
+ LEN_SCALING2=1.0
+ LEN_SCALING3=1.0
+ LEN_SCALING4=1.0
+ LEN_SCALING5=1.0
+
+#CPU usage
+ HOSTACCOUNT=NEOL0012
+ HOSTPPN=32            #number of CPUs per node on host machines
+ HOSTTYPE=cheyenne     #host type (used in job_submit.sh, currently supports "jet" and "stampede")
+ JOB_SUBMIT_MODE=2     # 1 - submit run_cycle.sh to queue as a single job. The scheduling of
+                       #     each component is taken care of in each module script.
+                       # 2 - execute run_cycle.sh as a bash script, each component is submitted
+                       #     as a separate job in the queue, scheduling is done by the queue.
+
+ wps_ntasks=32                  # number of processes for WPS programs and real.exe
+ wrf_ntasks=256                 # ..    ..  ..  ..  WRF run       (wrf.exe)
+ var3d_ntasks=128               # ..    ..  ..  ..  3DVar component (perturb_ic da_wrfvar.exe)
+ var4d_ntasks=(128 128 128)     # ..    ..  ..  ..  4DVar component (da_wrfvar.exe) (for each domain)
+ dart_ntasks=512                # ..    ..  ..  ..  EnKF component (enkf.mpi)
+ dart_ppn=32
+
