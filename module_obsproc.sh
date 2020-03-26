@@ -32,39 +32,44 @@ if $INCLUDE_LITTLE_R; then
     echo $obsdate >> datelist
   done
   for d in `cat datelist |sort |uniq`; do
-    #NCAR_LITTLE_R
     if [ -f $DATA_DIR/ncar_littler/${d:0:6}/obs.${d:0:10}.gz ]; then
       cp $DATA_DIR/ncar_littler/${d:0:6}/obs.${d:0:10}.gz .
       gunzip obs.${d:0:10}.gz
       cat obs.${d:0:10} >> obs.raw
       rm obs.${d:0:10}
     fi
-
-    #link more obs here
-    ##USE_MPD
   done
+
+  echo "    running obsproc.exe"
+  for var_type in 3DVAR; do
+    if ! $RUN_DART; then continue; fi
+    echo > obsproc.log
+    export use_for=$var_type
+    $SCRIPT_DIR/namelist_obsproc.sh > namelist.obsproc
+    ./obsproc.exe >& obsproc.log
+    watch_log obsproc.log 99999 1 $rundir
+    cp obs_gts_*.$var_type $WORK_DIR/obs/$DATE/.
+  done
+
+  echo "    running gts_to_dart"
+  $SCRIPT_DIR/namelist_dart.sh > input.nml
+  ln -fs obs_gts_`wrf_time_string $DATE`.3DVAR gts_obsout.dat
+  ln -fs $DART_DIR/observations/obs_converters/var/work/gts_to_dart .
+  ./gts_to_dart >& gts_to_dart.log
+  watch_log gts_to_dart.log successfully 1 $rundir
+  cp obs_seq.out $WORK_DIR/obs/$DATE/.
+
+  if $CLEAN; then rm obs.raw; fi
 fi
 
-echo "    running obsproc.exe"
-for var_type in 3DVAR; do
-  if ! $RUN_DART; then continue; fi
-  echo > obsproc.log
-  export use_for=$var_type
-  $SCRIPT_DIR/namelist_obsproc.sh > namelist.obsproc
-  ./obsproc.exe >& obsproc.log
-  watch_log obsproc.log 99999 1 $rundir
-  cp obs_gts_*.$var_type $WORK_DIR/obs/$DATE/.
-done
-
-echo "    running gts_to_dart"
-$SCRIPT_DIR/namelist_dart.sh > input.nml
-ln -fs obs_gts_`wrf_time_string $DATE`.3DVAR gts_obsout.dat
-ln -fs $DART_DIR/observations/obs_converters/var/work/gts_to_dart .
-./gts_to_dart >& gts_to_dart.log
-watch_log gts_to_dart.log successfully 1 $rundir
-cp obs_seq.out $WORK_DIR/obs/$DATE/.
-
-if $CLEAN; then rm obs.raw; fi
+if $INCLUDE_MPD; then
+  $SCRIPT_DIR/namelist_dart.sh > input.nml
+  ln -fs $WORK/data/MPD/wv_mpd/work/$DATE text.txt
+  ln -fs $DART_DIR/observations/obs_converters/text_MPD/work/text_to_obs .
+  ./text_to_obs >& text_to_obs.log
+  watch_log text_to_obs.log Finished 1 $rundir
+  cp obs_seq.out $WORK_DIR/obs/$DATE/.
+fi
 
 echo complete > stat
 

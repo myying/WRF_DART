@@ -190,23 +190,42 @@ cat << EOF
                               '../../../obs_def/obs_def_vortex_mod.f90'
 /
 
-&obs_kind_nml
-   assimilate_these_obs_types = 'RADIOSONDE_TEMPERATURE',
-                                'RADIOSONDE_U_WIND_COMPONENT',
+EOF
+
+echo "&obs_kind_nml"
+if $INCLUDE_LITTLE_R; then
+  cat << EOF
+   assimilate_these_obs_types = 'RADIOSONDE_U_WIND_COMPONENT',
                                 'RADIOSONDE_V_WIND_COMPONENT',
-                                'RADIOSONDE_SPECIFIC_HUMIDITY',
+                                'RADIOSONDE_TEMPERATURE',
                                 'SAT_U_WIND_COMPONENT',
                                 'SAT_V_WIND_COMPONENT',
+                                'SYNOP_U_WIND_COMPONENT',
+                                'SYNOP_V_WIND_COMPONENT',
+                                'SYNOP_SURFACE_PRESSURE',
+                                'SYNOP_TEMPERATURE',
+                                'AIREP_U_WIND_COMPONENT',
+                                'AIREP_V_WIND_COMPONENT',
+                                'AIREP_TEMPERATURE',
+                                'PILOT_U_WIND_COMPONENT',
+                                'PILOT_V_WIND_COMPONENT',
+                                'PROFILER_U_WIND_COMPONENT',
+                                'PROFILER_V_WIND_COMPONENT',
                                 'METAR_U_10_METER_WIND',
                                 'METAR_V_10_METER_WIND',
                                 'METAR_TEMPERATURE_2_METER',
+                                'SYNOP_DEWPOINT',
+                                'AIREP_DEWPOINT',
                                 'METAR_DEWPOINT_2_METER',
-                                'MARINE_SFC_U_WIND_COMPONENT',
-                                'MARINE_SFC_V_WIND_COMPONENT',
-                                'MARINE_SFC_TEMPERATURE',
-                                'MARINE_SFC_DEWPOINT',
-    evaluate_these_obs_types = 'null',
-/
+                                'RADIOSONDE_DEWPOINT',
+EOF
+fi
+if $INCLUDE_MPD; then
+  echo "   assimilate_these_obs_types = 'MPD_ABSOLUTE_HUMIDITY',"
+fi
+echo "/"
+
+cat << EOF
 
 &obs_diag_nml
    obs_sequence_name = 'obs_seq.final',
