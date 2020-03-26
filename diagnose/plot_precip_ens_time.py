@@ -64,7 +64,7 @@ for i in range(nx1):
       var1_out += var1[:, :, i, j]
 var1_out = var1_out/count
 
-# casename = "assim_MPD"
+casename = "assim_MPD"
 var2 = np.zeros((nt, nens, ny1, nx1))
 var2_out = np.zeros((nt, nens))
 for t in range(13, 33):
