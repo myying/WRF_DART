@@ -1,6 +1,23 @@
 ###WRF utility functions
 import numpy as np
 
+def advance_time(timestart, incr_minute):
+  import datetime
+  ccyy = int(timestart[0:4])
+  mm = int(timestart[4:6])
+  dd = int(timestart[6:8])
+  hh = int(timestart[8:10])
+  ii = int(timestart[10:12])
+  t1 = datetime.datetime(ccyy, mm, dd, hh, ii, 0)
+  t2 = t1 + datetime.timedelta(minutes=incr_minute)
+  ccyy = t2.year
+  mm = t2.month
+  dd = t2.day
+  hh = t2.hour
+  ii = t2.minute
+  timeout = "{:04d}{:02d}{:02d}{:02d}{:02d}".format(ccyy, mm, dd, hh, ii)
+  return timeout
+
 def ncread(filename, varname):
   import netCDF4
   f = netCDF4.Dataset(filename)
@@ -39,7 +56,9 @@ def getvar(infile, varname):
     var = ncread(infile, 'P') + ncread(infile, 'PB')
 
   elif (varname == 'z'):
-    var = (ncread(infile, 'P') + ncread(infile, 'PB')) / g
+    dat = (ncread(infile, 'PH') + ncread(infile, 'PHB')) / g
+    nt, nz, ny, nx = dat.shape
+    var = 0.5*(dat[:, 0:nz-1, :, :] + dat[:, 1:nz, :, :])
 
   elif (varname == 'th'):
     var = ncread(infile, 'T') + 300
@@ -48,6 +67,15 @@ def getvar(infile, varname):
     th = ncread(infile, 'T') + 300
     p = ncread(infile, 'P') + ncread(infile, 'PB')
     var = th * (p/100000.0) ** (Rd/Cp)
+
+  elif (varname == 'abs_humidity'):
+    th = ncread(infile, 'T') + 300
+    p = ncread(infile, 'P') + ncread(infile, 'PB')
+    tk = th * (p/100000.0) ** (Rd/Cp)
+    qvapor = ncread(infile, 'QVAPOR')
+    tv = tk * (1.0 + qvapor * Rv / Rd)
+    rho_dry = p / (Rd * tv)
+    var = qvapor * rho_dry * 1000
 
   else:
     var = ncread(infile, varname)
