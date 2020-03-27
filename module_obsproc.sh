@@ -65,7 +65,7 @@ fi
 if $INCLUDE_MPD; then
   $SCRIPT_DIR/namelist_dart.sh > input.nml
   ln -fs $WORK/data/MPD/wv_mpd/work/$DATE text.txt
-  ln -fs $DART_DIR/observations/obs_converters/text_MPD/work/text_to_obs .
+  ln -fs $DART_DIR/observations/obs_converters/MPD/work/text_to_obs .
   ./text_to_obs >& text_to_obs.log
   watch_log text_to_obs.log Finished 1 $rundir
   cp obs_seq.out $WORK_DIR/obs/$DATE/.
